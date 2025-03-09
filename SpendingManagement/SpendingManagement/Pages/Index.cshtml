@@ -1,0 +1,63 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="container mt-4">
+    <!-- Total Balance -->
+    <div class="card p-3 mb-3 text-center">
+        <h4>Total Balance</h4>
+        <h2 class="text-success">$10,500.00</h2>
+    </div>
+
+    <!-- Wallets Section -->
+    <div class="mb-3">
+        <h5>Wallets</h5>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex">
+                <div class="card p-2 me-2" style="width: 120px;">
+                    <h6>Wallet 1</h6>
+                    <p class="text-success">$3,500</p>
+                </div>
+                <div class="card p-2 me-2" style="width: 120px;">
+                    <h6>Wallet 2</h6>
+                    <p class="text-success">$2,500</p>
+                </div>
+                <div class="card p-2" style="width: 120px;">
+                    <h6>Wallet 3</h6>
+                    <p class="text-success">$4,500</p>
+                </div>
+            </div>
+            <a href="#" class="btn btn-link">Show All</a>
+        </div>
+    </div>
+
+    <!-- Mini Monthly Report -->
+    <div class="card p-3 mb-3">
+        <h5>Monthly Report</h5>
+        <p>Spending: <strong>$2,000</strong></p>
+        <p>Expense Trend: <strong>-5% from last month</strong></p>
+    </div>
+
+    <!-- Mostly Spending -->
+    <div class="card p-3 mb-3">
+        <h5>Mostly Spending</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Food - $500</li>
+            <li class="list-group-item">Shopping - $400</li>
+            <li class="list-group-item">Entertainment - $300</li>
+        </ul>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card p-3">
+        <h5>Recent Transactions</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Dinner - $50</li>
+            <li class="list-group-item">Groceries - $120</li>
+            <li class="list-group-item">Movie - $30</li>
+        </ul>
+    </div>
+</div>
+
