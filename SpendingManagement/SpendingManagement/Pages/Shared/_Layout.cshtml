@@ -9,38 +9,34 @@
     <link rel="stylesheet" href="~/SpendingManagement.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">SpendingManagement</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="text-center mb-4">
+            <h4>SpendingManagement</h4>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-page="/Index">🏠 Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-page="/Transactions">📋 Transactions</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-page="/Profile">👤 Account</a>
+            </li>
+        </ul>
+        <!-- Add Transaction Button inside Sidebar -->
+        <div class="text-center mt-4">
+            <a asp-page="/AddTransaction" class="btn btn-primary w-75 text-white text-decoration-none">➕ Add Transaction</a>
+        </div>
+    </div>
+    <div class="content">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - SpendingManagement - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+  
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,63 +1,272 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
+@{
+    // Dummy Labels (X-Axis)
+    var labels = new List<string> { "01 Mar", "", "", "", "", "", "30 Mar" };
+    var actualLabels = new List<string> { "01 Mar", "05 Mar", "10 Mar", "15 Mar", "20 Mar", "25 Mar", "30 Mar" };
 
-<div class="container mt-4">
-    <!-- Total Balance -->
-    <div class="card p-3 mb-3 text-center">
-        <h4>Total Balance</h4>
-        <h2 class="text-success">$10,500.00</h2>
+    // Expenses Data (Cumulative Sum)
+    var expenseRaw = new List<int> { 5000000, 2000000, 1000000, 2000000, 4000000, 1500000, 3000000 };
+    var expenseData = expenseRaw.Select((value, index) => expenseRaw.Take(index + 1).Sum()).ToList();
+    var expenseTotal = expenseData.LastOrDefault();
+
+    // Previous 3-month average (Cumulative)
+    var expenseAvgRaw = new List<int> { 4500000, 1800000, 900000, 1900000, 3800000, 1400000, 2900000 };
+    var expenseAvg = expenseAvgRaw.Select((value, index) => expenseAvgRaw.Take(index + 1).Sum()).ToList();
+
+    // Income Data (Cumulative Sum)
+    var incomeRaw = new List<int> { 10000000, 2000000, 1500000, 3000000, 2500000, 2000000, 4000000 };
+    var incomeData = incomeRaw.Select((value, index) => incomeRaw.Take(index + 1).Sum()).ToList();
+    var incomeTotal = incomeData.LastOrDefault();
+
+    // Previous 3-month average (Cumulative)
+    var incomeAvgRaw = new List<int> { 9700000, 1900000, 1400000, 2800000, 2400000, 1900000, 3800000 };
+    var incomeAvg = incomeAvgRaw.Select((value, index) => incomeAvgRaw.Take(index + 1).Sum()).ToList();
+
+    // Convert to JSON for JavaScript
+    var labelsJson = Json.Serialize(labels);
+    var actualLabelsJson = Json.Serialize(actualLabels);
+    var expenseJson = Json.Serialize(expenseData);
+    var expenseAvgJson = Json.Serialize(expenseAvg);
+    var incomeJson = Json.Serialize(incomeData);
+    var incomeAvgJson = Json.Serialize(incomeAvg);
+}
+<div class="container mt-3">
+
+    <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between">
+        <strong>My Wallets</strong>
+        <a asp-page="/Wallets" class="text-primary">See all</a>
     </div>
-
-    <!-- Wallets Section -->
-    <div class="mb-3">
-        <h5>Wallets</h5>
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex">
-                <div class="card p-2 me-2" style="width: 120px;">
-                    <h6>Wallet 1</h6>
-                    <p class="text-success">$3,500</p>
-                </div>
-                <div class="card p-2 me-2" style="width: 120px;">
-                    <h6>Wallet 2</h6>
-                    <p class="text-success">$2,500</p>
-                </div>
-                <div class="card p-2" style="width: 120px;">
-                    <h6>Wallet 3</h6>
-                    <p class="text-success">$4,500</p>
-                </div>
-            </div>
-            <a href="#" class="btn btn-link">Show All</a>
-        </div>
-    </div>
-
-    <!-- Mini Monthly Report -->
-    <div class="card p-3 mb-3">
-        <h5>Monthly Report</h5>
-        <p>Spending: <strong>$2,000</strong></p>
-        <p>Expense Trend: <strong>-5% from last month</strong></p>
-    </div>
-
-    <!-- Mostly Spending -->
-    <div class="card p-3 mb-3">
-        <h5>Mostly Spending</h5>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Food - $500</li>
-            <li class="list-group-item">Shopping - $400</li>
-            <li class="list-group-item">Entertainment - $300</li>
-        </ul>
-    </div>
-
-    <!-- Recent Transactions -->
-    <div class="card p-3">
-        <h5>Recent Transactions</h5>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Dinner - $50</li>
-            <li class="list-group-item">Groceries - $120</li>
-            <li class="list-group-item">Movie - $30</li>
+    <div class="card-body">
+        <ul class="list-group">
+            @{
+                if(Model.Wallets.Count == 0)
+                {
+                        <li class="list-group-item d-flex justify-content-center align-items-center">
+                            <div class="text-center mt-4">
+                                <button class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#createWalletModal">
+                                    + Add Wallet
+                                </button>
+                            </div>
+                        </li>
+                }
+            }
+            @foreach (var wallet in Model.Wallets)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    @* <img src="images/@wallet.Icon" alt="@wallet.Name" width="30" height="30" class="me-2"> *@
+                    <span>@wallet.Name</span>
+                    <span class="ms-auto @(wallet.Balance < 0 ? "text-danger" : "text-success")">
+                        @wallet.Balance?.ToString("N0") đ
+                    </span>
+                </li>
+            }
         </ul>
     </div>
 </div>
 
+    <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between">
+        <strong>Report This Month</strong>
+        <a asp-page="/ReportDetail" class="text-primary">See report</a>
+    </div>
+    <div class="card-body">
+        <!-- Buttons to switch between Expense and Income -->
+        <div class="text-center">
+            <button class="btn btn-danger" onclick="updateChart('expense')">Total Expense: @expenseTotal.ToString("N0") VND</button>
+            <button class="btn btn-primary" onclick="updateChart('income')">Total Income: @incomeTotal.ToString("N0") VND</button>
+        </div>
+
+        <canvas id="reportChart"></canvas>
+    </div>
+</div>
+
+
+    <!-- Top Spending Section -->
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between">
+            <span>Top Spending</span>
+            <a asp-page="/DetailExpenses" class="text-success">See details</a>
+        </div>
+        <div class="filter">
+            <button class="@((Model.SelectedFilter == "Week") ? "active" : "")" onclick="filterTopSpending('Week')">Week</button>
+            <button class="@((Model.SelectedFilter == "Month") ? "active" : "")" onclick="filterTopSpending('Month')">Month</button>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                @foreach (var spending in Model.TopSpending)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <img src="@spending.Icon" alt="@spending.Category" width="24" height="24">
+                            @spending.Category
+                        </div>
+                        <span class="text-danger">@spending.Percentage% (@spending.Amount.ToString("C"))</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Recent Transactions</span>
+            <a asp-page="/Transactions" class="text-success">See all</a>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                @foreach (var transaction in Model.RecentTransactions)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <img src="@transaction.Icon" alt="@transaction.Category" width="24" height="24">
+                            @transaction.Category
+                            <br>
+                            <small class="text-muted">@transaction.Date.ToString("dddd, dd MMMM yyyy")</small>
+                        </div>
+                        <span class="text-danger">@transaction.Amount.ToString("C")</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Creating New Wallet -->
+<div class="modal fade" id="createWalletModal" tabindex="-1" aria-labelledby="createWalletModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createWalletModalLabel">Create New Wallet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="walletName" class="form-label">Wallet Name</label>
+                        <input type="text" class="form-control" id="walletName" name="walletName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="walletBalance" class="form-label">Initial Balance</label>
+                        <input type="number" class="form-control" id="walletBalance" name="walletBalance" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('reportChart').getContext('2d');
+
+        // Parse JSON data from Razor
+        var labels = @Html.Raw(labelsJson);
+        var actualLabels = @Html.Raw(actualLabelsJson);
+        var expenseData = @Html.Raw(expenseJson);
+        var expenseAvg = @Html.Raw(expenseAvgJson);
+        var incomeData = @Html.Raw(incomeJson);
+        var incomeAvg = @Html.Raw(incomeAvgJson);
+
+        // Default View (Expense)
+        var currentData = expenseData;
+        var currentAvg = expenseAvg;
+        var currentLabel = 'This month';
+        var currentBorderColor = 'red';
+        var currentBackgroundColor = 'rgba(255, 0, 0, 0.2)';
+
+        // Create Chart
+        var reportChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: currentLabel,
+                        data: currentData,
+                        borderColor: currentBorderColor,
+                        fill: true,
+                        backgroundColor: currentBackgroundColor
+                    },
+                    {
+                        label: 'Previous 3-month average',
+                        data: currentAvg,
+                        borderColor: 'gray',
+                        fill: false,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                let value = tooltipItem.raw.toLocaleString() + ' VND';
+                                let date = actualLabels[tooltipItem.dataIndex];
+                                return `${tooltipItem.dataset.label}: ${value} (${date})`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Date' },
+                        ticks: {
+                            autoSkip: false,
+                            callback: function (value, index) {
+                                return labels[index];
+                            }
+                        }
+                    },
+                    y: {
+                        title: { display: true, text: 'Amount (VND)' }
+                    }
+                }
+            }
+        });
+
+        // Function to Update Chart
+        window.updateChart = function (type) {
+            if (type === 'expense') {
+                currentData = expenseData;
+                currentAvg = expenseAvg;
+                currentLabel = 'This month';
+                currentBorderColor = 'red';
+                currentBackgroundColor = 'rgba(255, 0, 0, 0.2)';
+            } else {
+                currentData = incomeData;
+                currentAvg = incomeAvg;
+                currentLabel = 'This month';
+                currentBorderColor = 'blue';
+                currentBackgroundColor = 'rgba(0, 0, 255, 0.2)';
+            }
+
+            // Update Chart Data
+            reportChart.data.datasets[0].data = currentData;
+            reportChart.data.datasets[0].label = currentLabel;
+            reportChart.data.datasets[0].borderColor = currentBorderColor;
+            reportChart.data.datasets[0].backgroundColor = currentBackgroundColor;
+            reportChart.data.datasets[1].data = currentAvg;
+
+            reportChart.update();
+        };
+
+            function filterTopSpending(filter) {
+            // Simulate filtering logic - in actual implementation, you might reload data from the server
+            window.location.href = '?filter=' + filter;
+        }
+    </script>
+}

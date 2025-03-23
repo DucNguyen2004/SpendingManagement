@@ -1,0 +1,166 @@
+﻿@page
+@model SpendingManagement.Pages.TransactionsModel
+@{
+}
+
+            <!-- Wallet Selection -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <h2>Transactions</h2>
+    <!-- Toggle View -->
+    <div class="d-flex justify-content-center mt-3">
+        <button class="btn btn-outline-primary me-2" id="viewByTransaction">View by Transaction</button>
+        <button class="btn btn-outline-secondary" id="viewByCategory">View by Category</button>
+    </div>
+                <select class="form-select w-auto">
+                    <option>My Cash</option>
+                    <option>Bank Account</option>
+                </select>
+            </div>
+
+            <!-- Balance Overview -->
+            <div class="mt-3 p-3 bg-white shadow-sm rounded">
+                <h5>Balance: <span class="text-primary">€1,035</span></h5>
+                <div class="d-flex justify-content-between">
+                    <span class="text-success">Inflow: +€2,500</span>
+                    <span class="text-danger">Outflow: -€1,465</span>
+                    <span class="fw-bold">+€1,035</span>
+                </div>
+            </div>
+
+
+<!-- Filter Menu -->
+<div class="dropdown mt-3 text-end">
+    <button class="btn btn-light dropdown-toggle" type="button" id="filterMenu" data-bs-toggle="dropdown" aria-expanded="false">
+        Filter Transactions
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="filterMenu">
+        <li><a class="dropdown-item" href="#">Day</a></li>
+        <li><a class="dropdown-item" href="#">Week</a></li>
+        <li><a class="dropdown-item" href="#">Month</a></li>
+        <li><a class="dropdown-item" href="#">Quarter</a></li>
+        <li><a class="dropdown-item" href="#">Year</a></li>
+        <li><a class="dropdown-item" href="#">All</a></li>
+        <li><a class="dropdown-item" href="#">Custom</a></li>
+    </ul>
+</div>
+
+            <!-- Tabs for Filtering -->
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Last Month</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">This Month</a>
+                </li>       
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Future</a>
+                </li>
+            </ul>
+
+<!-- Transaction List -->
+<div id="transactionView" class="mt-3">
+    <h6 class="text-muted">20 July 2024</h6>
+    <div class="d-flex justify-content-between p-2 border-bottom">
+        <div>
+            <span class="fw-bold">Shopping</span>
+            <small class="text-muted d-block">Groceries</small>
+        </div>
+        <span class="text-danger">-€1,200</span>
+    </div>
+
+    <h6 class="text-muted mt-3">12 July 2024</h6>
+    <div class="d-flex justify-content-between p-2 border-bottom">
+        <div>
+            <span class="fw-bold">Vehicle Maintenance</span>
+            <small class="text-muted d-block">Car Service</small>
+        </div>
+        <span class="text-danger">-€250</span>
+    </div>
+
+    <h6 class="text-muted mt-3">5 July 2024</h6>
+    <div class="d-flex justify-content-between p-2 border-bottom">
+        <div>
+            <span class="fw-bold">Salary</span>
+            <small class="text-muted d-block">Monthly Income</small>
+        </div>
+        <span class="text-success">+€2,500</span>
+    </div>
+</div>
+<!-- Transaction List (View by Category) -->
+<div id="categoryView" class="mt-3 d-none">
+    <div style="display: flex; justify-content:space-between">
+        <div style="display:flex">
+            <h6 class="fw-bold">Food & Beverage</h6>
+            <p>1 transactions</p>
+        </div>
+        <h6 class="fw-bold">250000</h6>
+
+    </div>
+    <div class="p-3 border rounded mb-2">
+        <div class="d-flex justify-content-between">
+            <span class="text-muted">20 July 2024, Saturday</span>
+            <span class="text-danger">-€15</span>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content:space-between">
+        <div style="display:flex">
+            <h6 class="fw-bold">Food & Beverage</h6>
+            <p>1 transactions</p>
+        </div>
+        <h6 class="fw-bold">250000</h6>
+
+    </div>
+    <div class="p-3 border rounded mb-2">
+        <div class="d-flex justify-content-between">
+            <span class="text-muted">20 July 2024, Saturday</span>
+            <span class="text-danger">-€1,200</span>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content:space-between">
+        <div style="display:flex">
+            <h6 class="fw-bold">Food & Beverage</h6>
+            <p>1 transactions</p>
+        </div>
+        <h6 class="fw-bold">250000</h6>
+
+    </div>
+    <div class="p-3 border rounded mb-2">
+        <div class="d-flex justify-content-between">
+            <span class="text-muted">12 July 2024, Friday</span>
+            <span class="text-danger">-€250</span>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content:space-between">
+        <div style="display:flex">
+            <h6 class="fw-bold">Food & Beverage</h6>
+            <p>1 transactions</p>
+        </div>
+        <h6 class="fw-bold">250000</h6>
+
+    </div>
+    <div class="p-3 border rounded mb-2">
+        <div class="d-flex justify-content-between">
+            <span class="text-muted">5 July 2024, Friday</span>
+            <span class="text-success">+€2,500</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('viewByTransaction').addEventListener('click', function() {
+        document.getElementById('transactionView').classList.remove('d-none');
+        document.getElementById('categoryView').classList.add('d-none');
+        this.classList.add('active');
+        document.getElementById('viewCategory').classList.remove('active');
+    });
+
+    document.getElementById('viewByCategory').addEventListener('click', function() {
+        document.getElementById('categoryView').classList.remove('d-none');
+        document.getElementById('transactionView').classList.add('d-none');
+        this.classList.add('active');
+        document.getElementById('viewTransaction').classList.remove('active');
+    });
+</script>

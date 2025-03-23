@@ -1,0 +1,78 @@
+﻿@page
+@model SpendingManagement.Pages.WalletsModel
+@{
+    ViewData["Title"] = "My Wallets";
+}
+
+<h2 class="mb-3">My Wallets</h2>
+
+<!-- Total Balance Section -->
+<div class="card mb-3">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <h4>Total</h4>
+        <h4 class="@(Model.TotalBalance < 0 ? "text-danger" : "text-success")">
+            @Model.TotalBalance.ToString("N0") đ
+        </h4>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Wallet Name</th>
+            <th class="text-end">Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var wallet in Model.Wallets)
+        {
+            <tr>
+                <td>
+                    <img src="~/images/wallet.png" alt="Wallet" width="30" height="30" class="me-2">
+                    @wallet.Name
+                </td>
+                <td class="text-end @(wallet.Balance < 0 ? "text-danger" : "text-success")">
+                    @wallet.Balance?.ToString("N0") đ
+                </td>
+                <td class="text-center">
+                    <a asp-page="WalletDetail" asp-route-id="@wallet.Id" class="btn btn-info btn-sm">View</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Add Wallet Button (Triggers Modal) -->
+<div class="text-center mt-4">
+    <button class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#createWalletModal">
+        + Add Wallet
+    </button>
+</div>
+
+<!-- Modal for Creating New Wallet -->
+<div class="modal fade" id="createWalletModal" tabindex="-1" aria-labelledby="createWalletModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createWalletModalLabel">Create New Wallet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="walletName" class="form-label">Wallet Name</label>
+                        <input type="text" class="form-control" id="walletName" name="walletName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="walletBalance" class="form-label">Initial Balance</label>
+                        <input type="number" class="form-control" id="walletBalance" name="walletBalance" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

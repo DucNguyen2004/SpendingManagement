@@ -1,3 +1,8 @@
+using SpendingManagement.DAOs;
+using SpendingManagement.Models;
+using SpendingManagement.Repositories;
+using SpendingManagement.Services;
+
 namespace SpendingManagement
 {
     public class Program
@@ -8,6 +13,11 @@ namespace SpendingManagement
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddDbContext<SpendingManagementContext>();
+            builder.Services.AddScoped<WalletDAO>();
+            builder.Services.AddSingleton<WalletRepository>();
+            builder.Services.AddSingleton<WalletService>();
+
 
             var app = builder.Build();
 
