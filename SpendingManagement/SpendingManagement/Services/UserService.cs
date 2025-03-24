@@ -27,5 +27,9 @@ namespace SpendingManagement.Services
         {
             return userRepository.ChangePassword(userId, newPassword);
         }
+        public bool RegisterUser(User user)
+        {
+            return userRepository.RegisterUser(user);
+        }
     }
 }

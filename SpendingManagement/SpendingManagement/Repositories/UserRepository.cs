@@ -28,5 +28,9 @@ namespace SpendingManagement.Repositories
         {
             return userDAO.ChangePassword(userId, newPassword);
         }
+        public bool RegisterUser(User user)
+        {
+            return userDAO.RegisterUser(user);
+        }
     }
 }

@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SpendingManagement.Models;
+using SpendingManagement.Services;
 
 namespace SpendingManagement.Pages
 {
     public class WalletsModel : PageModel
     {
-        private readonly SpendingManagementContext _context;
-
-        public WalletsModel(SpendingManagementContext context)
+        private readonly WalletService _walletService;
+        public WalletsModel(WalletService walletService)
         {
-            _context = context;
+            _walletService = walletService;
         }
 
         [BindProperty]
@@ -20,18 +20,23 @@ namespace SpendingManagement.Pages
         public decimal WalletBalance { get; set; }
         public List<Wallet> Wallets { get; set; } = new();
         public decimal TotalBalance { get; set; }
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            // Dummy Data
-            Wallets = new List<Wallet>
-            {
-            new Wallet { Id = 1, Name = "Cash", Balance = -203433000 },
-            new Wallet { Id = 2, Name = "Card", Balance = 7274000 },
-            new Wallet { Id = 3, Name = "VPS", Balance = 23000000 }
-            };
+            int? userId = HttpContext.Session.GetInt32("UserId");
 
-            // Calculate total balance
-            TotalBalance = Wallets.Sum(w => w.Balance ?? 0);
+            if (userId != null)
+            {
+                Wallets = _walletService.GetAll(userId.Value);
+                // Calculate total balance
+                TotalBalance = Wallets.Sum(w => w.Balance ?? 0);
+
+                return Page();
+            }
+            else
+            {
+                return RedirectToPage("/Login");
+            }
+
         }
 
         //public async Task<IActionResult> OnGetAsync()

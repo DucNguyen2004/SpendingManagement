@@ -31,5 +31,9 @@ namespace SpendingManagement.Services
         {
             return _walletRepo.DeleteWallet(walletId, userId);
         }
+        public Wallet GetWalletById(int walletId, int userId)
+        {
+            return _walletRepo.GetWalletById(walletId, userId);
+        }
     }
 }

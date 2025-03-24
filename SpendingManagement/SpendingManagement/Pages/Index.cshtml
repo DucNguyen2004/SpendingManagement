@@ -48,6 +48,7 @@
                 {
                         <li class="list-group-item d-flex justify-content-center align-items-center">
                             <div class="text-center mt-4">
+                                <p>There is no wallet</p>
                                 <button class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#createWalletModal">
                                     + Add Wallet
                                 </button>
@@ -149,16 +150,16 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="walletName" class="form-label">Wallet Name</label>
-                        <input type="text" class="form-control" id="walletName" name="walletName" required>
+                        <input type="text" class="form-control" id="walletName" name="WalletName" required>
                     </div>
                     <div class="mb-3">
                         <label for="walletBalance" class="form-label">Initial Balance</label>
-                        <input type="number" class="form-control" id="walletBalance" name="walletBalance" required>
+                        <input type="number" class="form-control" id="walletBalance" name="WalletBalance" min="0" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" asp-page-handler="AddWallet" class="btn btn-primary">Create</button>
                 </div>
             </form>
         </div>
@@ -267,6 +268,7 @@
             function filterTopSpending(filter) {
             // Simulate filtering logic - in actual implementation, you might reload data from the server
             window.location.href = '?filter=' + filter;
+
         }
     </script>
 }

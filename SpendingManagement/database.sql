@@ -114,3 +114,5 @@ INSERT INTO Categories (name, type) VALUES
 ('Uncategorized', 'income');
 
 select * from Categories
+select * from Wallets
+select * from Users

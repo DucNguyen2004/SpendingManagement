@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SpendingManagement.Models;
 using SpendingManagement.Services;
@@ -7,6 +8,12 @@ namespace SpendingManagement.Pages
     public class IndexModel : PageModel
     {
         private WalletService _walletService;
+
+        [BindProperty]
+        public string WalletName { get; set; }
+
+        [BindProperty]
+        public decimal WalletBalance { get; set; }
         public List<Wallet> Wallets { get; set; } = new();
         public List<TopSpendingItem> TopSpending { get; set; }
         public List<RecentTransactionItem> RecentTransactions { get; set; }
@@ -18,14 +25,12 @@ namespace SpendingManagement.Pages
         }
         public void OnGet()
         {
-            // Dummy data (replace with database logic)
-            //Wallets = new List<Wallet>
-            //{
-            //    new Wallet { Id = 1, Name = "Cash", Balance = -203433000},
-            //    new Wallet { Id = 2, Name = "Card", Balance = 7274000},
-            //    new Wallet { Id = 3, Name = "VPS", Balance = 23000000},
-            //    new Wallet { Id = 4, Name = "Home", Balance = -1355000}
-            //};
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId != null)
+            {
+                Wallets = _walletService.GetAll(userId.Value);
+            }
 
             // Get top 3 included wallets
             Wallets = Wallets
@@ -47,24 +52,45 @@ namespace SpendingManagement.Pages
             };
         }
 
-        public void OnPostAsync()
+        public IActionResult OnPostAddWalletAsync()
         {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToPage("/Login");
+            }
 
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            Wallet newWallet = new Wallet
+            {
+                UserId = userId.Value,
+                Name = WalletName,
+                Balance = WalletBalance
+            };
+
+            _walletService.AddWallet(newWallet);
+
+            return RedirectToPage();
         }
     }
-    public class TopSpendingItem
-    {
-        public string Category { get; set; }
-        public decimal Amount { get; set; }
-        public int Percentage { get; set; }
-        public string Icon { get; set; }
-    }
-
-    public class RecentTransactionItem
-    {
-        public string Category { get; set; }
-        public decimal Amount { get; set; }
-        public DateTime Date { get; set; }
-        public string Icon { get; set; }
-    }
 }
+public class TopSpendingItem
+{
+    public string Category { get; set; }
+    public decimal Amount { get; set; }
+    public int Percentage { get; set; }
+    public string Icon { get; set; }
+}
+
+public class RecentTransactionItem
+{
+    public string Category { get; set; }
+    public decimal Amount { get; set; }
+    public DateTime Date { get; set; }
+    public string Icon { get; set; }
+}
+

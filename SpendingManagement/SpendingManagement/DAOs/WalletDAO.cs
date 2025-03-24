@@ -15,6 +15,10 @@ namespace SpendingManagement.DAOs
         {
             return context.Wallets.Include(w => w.User).Where(w => w.UserId == userId).ToList();
         }
+        public Wallet GetWalletById(int walletId, int userId)
+        {
+            return context.Wallets.FirstOrDefault(w => w.Id == walletId && w.UserId == userId);
+        }
 
         public void AddWallet(Wallet wallet)
         {

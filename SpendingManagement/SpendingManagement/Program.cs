@@ -15,15 +15,15 @@ namespace SpendingManagement
             builder.Services.AddHttpContextAccessor();
             // Add services to the container.
             builder.Services.AddRazorPages();
-            
+
             builder.Services.AddDbContext<SpendingManagementContext>();
             builder.Services.AddScoped<UserDAO>();
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<UserService>();
 
-            //builder.Services.AddScoped<WalletDAO>();
-            //builder.Services.AddScoped<WalletRepository>();
-            //builder.Services.AddScoped<WalletService>();
+            builder.Services.AddScoped<WalletDAO>();
+            builder.Services.AddScoped<WalletRepository>();
+            builder.Services.AddScoped<WalletService>();
 
             builder.Services.AddScoped<WalletDAO>();
             builder.Services.AddScoped<WalletRepository>();

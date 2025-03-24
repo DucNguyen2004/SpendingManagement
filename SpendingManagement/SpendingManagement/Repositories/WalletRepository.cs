@@ -31,5 +31,9 @@ namespace SpendingManagement.Repositories
         {
             return _walletDAO.DeleteWallet(walletId, userId);
         }
+        public Wallet GetWalletById(int walletId, int userId)
+        {
+            return _walletDAO.GetWalletById(walletId, userId);
+        }
     }
 }

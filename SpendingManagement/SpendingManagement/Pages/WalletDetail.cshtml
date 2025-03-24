@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/WalletDetail/{id:int}"
 @model WalletDetailModel
 @{
 }
@@ -15,15 +15,15 @@
 
 <div class="mt-3 p-3 bg-white shadow-sm rounded">
     <div class="d-flex align-items-center">
-        <img src="/path-to-wallet-icon.png" alt="Wallet Icon" class="me-3" width="50">
+        <img src="~/images/wallet.png" alt="Wallet Icon" class="me-3" width="50">
         <div>
-            <h5>Online</h5>
-            <small>Vietnamese Dong (VND)</small>
+            <h5>@(Model.Wallet.Name)</h5>
+            <small>@Model.Wallet.Balance</small>
         </div>
     </div>
 </div>
 <div style="display:flex; justify-content: center">
-    <button class="btn btn-outline-success mt-3">Tranfer Money</button>
+    <button class="btn btn-outline-success mt-3">Transfer Money</button>
 </div>
 
 <!-- Edit Wallet Modal -->
@@ -34,28 +34,31 @@
                 <h5 class="modal-title" id="editWalletModalLabel">Edit Wallet</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="mb-3 text-center">
-                    <img src="wallet-icon.png" alt="Wallet Icon" class="img-fluid rounded-circle" width="50">
-                    <h4>Online</h4>
+            <form method="post">
+                <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <img src="~/images/wallet.png" alt="Wallet Icon" class="me-3" width="50">
+                        <h4>Online</h4>
+                    </div>
+                    <input type="hidden" asp-for="Wallet.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" asp-for="Wallet.Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Currency</label>
+                        <input type="text" class="form-control" value="Việt Nam Đồng" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Balance</label>
+                        <input type="number" class="form-control" asp-for="Wallet.Balance" min="0" required>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Name</label>
-                    <input type="text" class="form-control" value="Online">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" asp-page-handler="Update" class="btn btn-primary">Save</button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Currency</label>
-                    <input type="text" class="form-control" value="Việt Nam Đồng" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Balance</label>
-                    <input type="number" class="form-control" value="5700000">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Save</button>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -73,10 +76,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger">Delete</button>
+                <form method="post">
+                    <input type="hidden" asp-for="Wallet.Id" />
+                    <button type="submit" asp-page-handler="Delete" class="btn btn-danger">Delete</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-

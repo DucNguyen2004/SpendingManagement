@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SpendingManagement.Models;
+﻿using SpendingManagement.Models;
 
 namespace SpendingManagement.DAOs
 {
@@ -44,6 +43,17 @@ namespace SpendingManagement.DAOs
             }
 
             user.Password = newPassword;
+            context.SaveChanges();
+            return true;
+        }
+        public bool RegisterUser(User user)
+        {
+            if (context.Users.Any(u => u.Email == user.Email))
+            {
+                return false; // Email already exists
+            }
+
+            context.Users.Add(user);
             context.SaveChanges();
             return true;
         }
