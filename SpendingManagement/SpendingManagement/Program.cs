@@ -10,13 +10,24 @@ namespace SpendingManagement
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession();
+            builder.Services.AddHttpContextAccessor();
             // Add services to the container.
             builder.Services.AddRazorPages();
+            
             builder.Services.AddDbContext<SpendingManagementContext>();
+            builder.Services.AddScoped<UserDAO>();
+            builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<UserService>();
+
+            //builder.Services.AddScoped<WalletDAO>();
+            //builder.Services.AddScoped<WalletRepository>();
+            //builder.Services.AddScoped<WalletService>();
+
             builder.Services.AddScoped<WalletDAO>();
-            builder.Services.AddSingleton<WalletRepository>();
-            builder.Services.AddSingleton<WalletService>();
+            builder.Services.AddScoped<WalletRepository>();
+            builder.Services.AddScoped<WalletService>();
 
 
             var app = builder.Build();
@@ -28,7 +39,7 @@ namespace SpendingManagement
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
