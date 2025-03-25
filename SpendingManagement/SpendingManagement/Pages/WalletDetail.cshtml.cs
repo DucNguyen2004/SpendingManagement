@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SpendingManagement.Models;
 using SpendingManagement.Services;
+using System.Security.Cryptography.Xml;
 
 namespace SpendingManagement.Pages
 {
@@ -54,5 +55,17 @@ namespace SpendingManagement.Pages
             _walletService.DeleteWallet(Wallet.Id, userId.Value);
             return RedirectToPage("/Wallets");
         }
+
+        //public IActionResult OnPostTransfer()
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        Wallets = _walletService.GetAllWallets();
+        //        return Page();
+        //    }
+
+        //    _transactionService.TransferMoney(Transfer);
+        //    return RedirectToPage("/Wallets");
+        //}
     }
 }
