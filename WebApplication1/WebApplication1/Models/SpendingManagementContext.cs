@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
-namespace SpendingManagement.Models;
+namespace WebApplication1.Models;
 
 public partial class SpendingManagementContext : DbContext
 {

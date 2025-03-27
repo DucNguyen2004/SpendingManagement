@@ -38,7 +38,30 @@ namespace SpendingManagement.Pages
             }
 
         }
+        public IActionResult OnPostAddWalletAsync()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToPage("/Login");
+            }
 
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            Wallet newWallet = new Wallet
+            {
+                UserId = userId.Value,
+                Name = WalletName,
+                Balance = WalletBalance
+            };
+
+            _walletService.AddWallet(newWallet);
+
+            return RedirectToPage();
+        }
         //public async Task<IActionResult> OnGetAsync()
         //{
         //    Wallets = await _context.Wallets

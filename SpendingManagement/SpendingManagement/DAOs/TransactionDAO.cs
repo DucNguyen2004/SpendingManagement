@@ -1,4 +1,5 @@
-﻿using SpendingManagement.Models;
+using Microsoft.EntityFrameworkCore;
+using SpendingManagement.Models;
 
 namespace SpendingManagement.DAOs
 {
@@ -11,29 +12,42 @@ namespace SpendingManagement.DAOs
             _context = context;
         }
 
-        //public List<Transaction> GetByWalletId(int walletId)
-        //{
-        //    return _context.Transactions.Where(t => t.WalletId == walletId).ToList();
-        //}
-
-        public Transaction GetById(int id)
-        {
-            return _context.Transactions.FirstOrDefault(t => t.Id == id);
-        }
-
         public void Add(Transaction transaction)
         {
-            _context.Transactions.Add(transaction);
+            _context.Add(transaction);
             _context.SaveChanges();
         }
 
-        public void Update(Transaction transaction)
+        public Transaction GetTransactionById(int id)
         {
-            _context.Transactions.Update(transaction);
-            _context.SaveChanges();
+            return _context.Transactions.Include(t => t.Wallet)
+                .FirstOrDefault(t => t.Id == id);
         }
 
-        public void Delete(int id)
+        public List<Transaction> GetTransactionsByWalletId(int walletId)
+        {
+            return _context.Transactions
+                .Where(t => t.WalletId == walletId)
+                .ToList();
+        }
+
+        public void UpdateTransaction(Transaction transaction)
+        {
+            var existingTransaction = _context.Transactions.Find(transaction.Id);
+            if (existingTransaction != null)
+            {
+                existingTransaction.WalletId = transaction.WalletId;
+                existingTransaction.CategoryId = transaction.CategoryId;
+                existingTransaction.Amount = transaction.Amount;
+                existingTransaction.Type = transaction.Type;
+                existingTransaction.Note = transaction.Note;
+                existingTransaction.Date = transaction.Date;
+
+                _context.SaveChanges();
+            }
+        }
+
+        public void DeleteTransaction(int id)
         {
             var transaction = _context.Transactions.Find(id);
             if (transaction != null)

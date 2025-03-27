@@ -48,12 +48,14 @@ GO
 CREATE TABLE Transactions (
     id         INT IDENTITY(1,1) PRIMARY KEY,
     userID     INT NOT NULL,
+    walletID   INT NOT NULL,
     categoryID INT NOT NULL,
     amount     DECIMAL(18,2) NOT NULL,
-    type       NVARCHAR(10) CHECK (type IN ('income', 'expense')) NOT NULL,
+    type       NVARCHAR(10) CHECK (type IN ('income', 'expense', 'transfer')) NOT NULL,
     note       NVARCHAR(MAX),
     date       DATE NOT NULL,
     FOREIGN KEY (userID) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (walletID) REFERENCES Wallets(id) ON DELETE CASCADE,
     FOREIGN KEY (categoryID) REFERENCES Categories(id) ON DELETE NO ACTION
 );
 GO

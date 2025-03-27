@@ -11,22 +11,29 @@ namespace SpendingManagement.Repositories
             _transactionDAO = transactionDAO;
         }
 
-        public Transaction GetById(int id)
-        {
-            return _transactionDAO.GetById(id);
-        }
-
         public void Add(Transaction transaction)
         {
             _transactionDAO.Add(transaction);
         }
-        public void Delete(Transaction transaction)
+
+        public Transaction GetTransactionById(int id)
         {
-            _transactionDAO.Delete(transaction.Id);
+            return _transactionDAO.GetTransactionById(id);
         }
-        public void Update(Transaction transaction)
+
+        public List<Transaction> GetTransactionsByWalletId(int walletId)
         {
-            _transactionDAO.Update(transaction);
+            return _transactionDAO.GetTransactionsByWalletId(walletId);
+        }
+
+        public void UpdateTransaction(Transaction transaction)
+        {
+            _transactionDAO.UpdateTransaction(transaction);
+        }
+
+        public void DeleteTransaction(int id)
+        {
+            _transactionDAO.DeleteTransaction(id);
         }
     }
 }

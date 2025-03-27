@@ -14,18 +14,17 @@
     <!-- Transaction Form -->
     <form method="post">
         <div class="mt-3 p-3 bg-white shadow-sm rounded">
-            <input type="hidden" asp-for="Transaction.WalletId" />
-
             <!-- Wallet Selection -->
             <div class="mt-3">
                 <label class="form-label">Wallet</label>
-                <select class="form-select" asp-for="Transaction.WalletId">
+                <select class="form-select" asp-for="Transaction.WalletId" required>
                     <option value="">Select Wallet</option>
                     @foreach (var wallet in Model.Wallets)
                     {
                         <option value="@wallet.Id">@wallet.Name</option>
                     }
                 </select>
+                <span asp-validation-for="Transaction.WalletId" class="text-danger"></span>
             </div>
 
             <!-- Amount Input -->
@@ -35,17 +34,30 @@
                     <span class="input-group-text">VND</span>
                     <input type="number" class="form-control" asp-for="Transaction.Amount" placeholder="0" required>
                 </div>
+                <span asp-validation-for="Transaction.Amount" class="text-danger"></span>
             </div>
 
             <!-- Category Selection -->
             <div class="mt-3">
                 <label class="form-label">Category</label>
-                <select class="form-select" asp-for="Transaction.Category">
+                <select class="form-select" asp-for="Transaction.CategoryId" required>
                     <option value="">Select Category</option>
-                    <option value="Food">Food</option>
-                    <option value="Shopping">Shopping</option>
-                    <option value="Transport">Transport</option>
+
+                    <optgroup label="Income">
+                        @foreach (var category in Model.IncomeCategories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </optgroup>
+
+                    <optgroup label="Expense">
+                        @foreach (var category in Model.ExpenseCategories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </optgroup>
                 </select>
+                <span asp-validation-for="Transaction.CategoryId" class="text-danger"></span>
             </div>
 
             <!-- Note -->
@@ -58,12 +70,13 @@
             <div class="mt-3">
                 <label class="form-label">Date</label>
                 <input type="date" class="form-control" asp-for="Transaction.Date" required>
+                <span asp-validation-for="Transaction.Date" class="text-danger"></span>
             </div>
-        </div>
 
-        <!-- Save Button -->
-        <div class="mt-3 text-center">
-            <button type="submit" class="btn btn-primary w-100">Save</button>
+            <!-- Save Button -->
+            <div class="mt-3 text-center">
+                <button type="submit" class="btn btn-primary w-100">Save</button>
+            </div>
         </div>
     </form>
 </div>

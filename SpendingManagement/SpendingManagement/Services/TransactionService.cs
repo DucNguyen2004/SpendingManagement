@@ -6,25 +6,35 @@ namespace SpendingManagement.Services
     public class TransactionService
     {
         private TransactionRepository _transactionRepo;
-        public TransactionService(TransactionRepository transactionRepository)
+
+        public TransactionService(TransactionRepository transactionRepo)
         {
-            _transactionRepo = transactionRepository;
+            _transactionRepo = transactionRepo;
         }
-        public Transaction GetById(int id)
-        {
-            return _transactionRepo.GetById(id);
-        }
+
         public void Add(Transaction transaction)
         {
             _transactionRepo.Add(transaction);
         }
-        public void Delete(Transaction transaction)
+
+        public Transaction GetTransactionById(int id)
         {
-            _transactionRepo.Delete(transaction);
+            return _transactionRepo.GetTransactionById(id);
         }
-        public void Update(Transaction transaction)
+
+        public List<Transaction> GetTransactionsByWalletId(int walletId)
         {
-            _transactionRepo.Update(transaction);
+            return _transactionRepo.GetTransactionsByWalletId(walletId);
+        }
+
+        public void UpdateTransaction(Transaction transaction)
+        {
+            _transactionRepo.UpdateTransaction(transaction);
+        }
+
+        public void DeleteTransaction(int id)
+        {
+            _transactionRepo.DeleteTransaction(id);
         }
     }
 }

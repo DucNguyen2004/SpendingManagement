@@ -7,32 +7,59 @@ namespace SpendingManagement.Pages
 {
     public class AddTransactionModel : PageModel
     {
-        private readonly TransactionService _transactionService;
+        private readonly CategoryService _categoryService;
         private readonly WalletService _walletService;
-
+        private readonly TransactionService _transactionService;
+        public AddTransactionModel(CategoryService categoryService, WalletService walletService, TransactionService transactionService)
+        {
+            _categoryService = categoryService;
+            _walletService = walletService;
+            _transactionService = transactionService;
+        }
         [BindProperty]
-        public Transaction Transaction { get; set; } = new Transaction();
+        public Transaction Transaction { get; set; }
 
         public List<Wallet> Wallets { get; set; }
+        public List<Category> IncomeCategories { get; set; }
+        public List<Category> ExpenseCategories { get; set; }
 
-        [BindProperty(SupportsGet = true)]
-        public int WalletId { get; set; }
-
-        public AddTransactionModel(TransactionService transactionService, WalletService walletService)
+        public async Task<IActionResult> OnGetAsync()
         {
-            _transactionService = transactionService;
-            _walletService = walletService;
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null) return RedirectToPage("/Login");
+
+            Wallets = _walletService.GetAll(userId.Value);
+            if (Wallets.Count == 0)
+            {
+                return RedirectToPage("/Wallets");
+            }
+            IncomeCategories = _categoryService.GetIncomeCategories();
+            ExpenseCategories = _categoryService.GetExpenseCategories();
+            return Page();
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnPostAsync()
         {
-            //Wallets = _walletService.GetAll();
+            int? userId = HttpContext.Session.GetInt32("UserId");
 
-            //// Set WalletId if passed via URL
-            //if (WalletId != 0)
-            //{
-            //    //Transaction.WalletId = WalletId;
-            //}
+            // Set Transaction Type Based on Category Type
+            var selectedCategory = _categoryService.GetCategory(Transaction.CategoryId);
+            if (selectedCategory == null || Transaction.WalletId == 0)
+            {
+                Wallets = _walletService.GetAll(userId.Value);
+                IncomeCategories = _categoryService.GetIncomeCategories();
+                ExpenseCategories = _categoryService.GetExpenseCategories();
+                //ModelState.AddModelError("Transaction.CategoryId", "Invalid category.");
+                return Page();
+            }
+
+            Transaction.Type = selectedCategory.Type;
+            Transaction.UserId = userId.Value;
+
+            _transactionService.Add(Transaction);
+
+            return RedirectToPage("/Transactions");
         }
 
         //public IActionResult OnPost()

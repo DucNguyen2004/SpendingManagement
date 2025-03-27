@@ -21,13 +21,17 @@ namespace SpendingManagement
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<UserService>();
 
-            builder.Services.AddScoped<WalletDAO>();
-            builder.Services.AddScoped<WalletRepository>();
-            builder.Services.AddScoped<WalletService>();
+            builder.Services.AddScoped<TransactionDAO>();
+            builder.Services.AddScoped<TransactionRepository>();
+            builder.Services.AddScoped<TransactionService>();
 
             builder.Services.AddScoped<WalletDAO>();
             builder.Services.AddScoped<WalletRepository>();
             builder.Services.AddScoped<WalletService>();
+
+            builder.Services.AddScoped<CategoryDAO>();
+            builder.Services.AddScoped<CategoryRepository>();
+            builder.Services.AddScoped<CategoryService>();
 
 
             var app = builder.Build();
