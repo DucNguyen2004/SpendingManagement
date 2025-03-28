@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SpendingManagement.Models;
 using SpendingManagement.Services;
-using System.Security.Cryptography.Xml;
 
 namespace SpendingManagement.Pages
 {
@@ -15,6 +14,7 @@ namespace SpendingManagement.Pages
         }
         [BindProperty]
         public Wallet Wallet { get; set; }
+        public List<Wallet> Wallets { get; set; }
         public IActionResult OnGet(int id)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -22,7 +22,7 @@ namespace SpendingManagement.Pages
             if (userId != null)
             {
                 Wallet = _walletService.GetWalletById(id, userId.Value);
-
+                Wallets = _walletService.GetAll(userId.Value);
                 if (Wallet == null)
                 {
                     return NotFound();

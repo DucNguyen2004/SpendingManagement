@@ -16,7 +16,7 @@ public partial class Transaction
 
     public string? Note { get; set; }
 
-    public DateOnly Date { get; set; }
+    public DateTime Date { get; set; }
 
     public virtual Category Category { get; set; } = null!;
 

@@ -35,5 +35,13 @@ namespace SpendingManagement.Repositories
         {
             _transactionDAO.DeleteTransaction(id);
         }
+        public List<Transaction> GetTransactionBetweenDates(DateTime start, DateTime end)
+        {
+            return _transactionDAO.GetTransactionBetweenDates(start, end);
+        }
+        public List<Transaction> GetRecentTransactions(int userId)
+        {
+            return _transactionDAO.GetRecentTransactions(userId);
+        }
     }
 }

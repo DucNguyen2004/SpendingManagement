@@ -36,5 +36,13 @@ namespace SpendingManagement.Services
         {
             _transactionRepo.DeleteTransaction(id);
         }
+        public List<Transaction> GetTransactionBetweenDates(DateTime start, DateTime end)
+        {
+            return _transactionRepo.GetTransactionBetweenDates(start, end);
+        }
+        public List<Transaction> GetRecentTransactions(int userId)
+        {
+            return _transactionRepo.GetRecentTransactions(userId);
+        }
     }
 }

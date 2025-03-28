@@ -22,12 +22,6 @@ namespace SpendingManagement.Pages
         public List<Wallet> Wallets { get; set; }
         public List<Category> IncomeCategories { get; set; }
         public List<Category> ExpenseCategories { get; set; }
-        [BindProperty]
-        public Transaction Transaction { get; set; }
-
-        public List<Wallet> Wallets { get; set; }
-        public List<Category> IncomeCategories { get; set; }
-        public List<Category> ExpenseCategories { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -68,18 +62,5 @@ namespace SpendingManagement.Pages
             return RedirectToPage("/Transactions");
         }
 
-        //public IActionResult OnPost()
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        Wallets = _walletService.GetAllWallets();
-        //        return Page();
-        //    }
-
-        //    Transaction.Date = DateTime.Now;
-        //    _transactionService.AddTransaction(Transaction);
-
-        //    return RedirectToPage("/Transactions", new { WalletId = Transaction.WalletId });
-        //}
     }
 }

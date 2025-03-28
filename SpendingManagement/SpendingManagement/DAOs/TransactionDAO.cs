@@ -14,6 +14,18 @@ namespace SpendingManagement.DAOs
 
         public void Add(Transaction transaction)
         {
+            var wallet = _context.Wallets.Find(transaction.WalletId);
+            if (wallet == null) return;
+
+            // Adjust wallet balance based on transaction type
+            if (transaction.Type.ToLower().Equals("income"))
+            {
+                wallet.Balance += transaction.Amount;
+            }
+            else if (transaction.Type.ToLower().Equals("expense"))
+            {
+                wallet.Balance -= transaction.Amount;
+            }
             _context.Add(transaction);
             _context.SaveChanges();
         }
@@ -34,27 +46,78 @@ namespace SpendingManagement.DAOs
         public void UpdateTransaction(Transaction transaction)
         {
             var existingTransaction = _context.Transactions.Find(transaction.Id);
-            if (existingTransaction != null)
-            {
-                existingTransaction.WalletId = transaction.WalletId;
-                existingTransaction.CategoryId = transaction.CategoryId;
-                existingTransaction.Amount = transaction.Amount;
-                existingTransaction.Type = transaction.Type;
-                existingTransaction.Note = transaction.Note;
-                existingTransaction.Date = transaction.Date;
+            if (existingTransaction == null) return;
 
-                _context.SaveChanges();
+            var wallet = _context.Wallets.Find(transaction.WalletId);
+            if (wallet == null) return;
+
+            // Revert the old transaction impact
+            if (existingTransaction.Type == "income")
+            {
+                wallet.Balance -= existingTransaction.Amount;
             }
+            else if (existingTransaction.Type == "expense")
+            {
+                wallet.Balance += existingTransaction.Amount;
+            }
+
+            // Apply the new transaction impact
+            if (transaction.Type == "income")
+            {
+                wallet.Balance += transaction.Amount;
+            }
+            else if (transaction.Type == "expense")
+            {
+                wallet.Balance -= transaction.Amount;
+            }
+
+            // Update transaction details
+            existingTransaction.WalletId = transaction.WalletId;
+            existingTransaction.CategoryId = transaction.CategoryId;
+            existingTransaction.Amount = transaction.Amount;
+            existingTransaction.Type = transaction.Type;
+            existingTransaction.Note = transaction.Note;
+            existingTransaction.Date = transaction.Date;
+
+            _context.SaveChanges();
         }
 
         public void DeleteTransaction(int id)
         {
             var transaction = _context.Transactions.Find(id);
-            if (transaction != null)
+            if (transaction == null) return;
+
+            var wallet = _context.Wallets.Find(transaction.WalletId);
+            if (wallet != null)
             {
-                _context.Transactions.Remove(transaction);
-                _context.SaveChanges();
+                if (transaction.Type == "income")
+                {
+                    wallet.Balance -= transaction.Amount;
+                }
+                else if (transaction.Type == "expense")
+                {
+                    wallet.Balance += transaction.Amount;
+                }
             }
+
+            _context.Transactions.Remove(transaction);
+            _context.SaveChanges();
+        }
+
+        public List<Transaction> GetTransactionBetweenDates(DateTime start, DateTime end)
+        {
+            return _context.Transactions.Include(t => t.Category)
+                .Where(t => t.Date >= start && t.Date <= end)
+                .ToList();
+        }
+
+        public List<Transaction> GetRecentTransactions(int userId)
+        {
+            return _context.Transactions.Include(t => t.Category).Include(t => t.Wallet)
+                .Where(t => t.UserId == userId && t.Date <= DateTime.Now)
+                .OrderByDescending(t => t.Id) // Sort by newest
+                .Take(3) // Show only the latest 5 transactions.ToList();
+                .ToList();
         }
     }
 

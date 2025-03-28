@@ -53,7 +53,7 @@ CREATE TABLE Transactions (
     amount     DECIMAL(18,2) NOT NULL,
     type       NVARCHAR(10) CHECK (type IN ('income', 'expense', 'transfer')) NOT NULL,
     note       NVARCHAR(MAX),
-    date       DATE NOT NULL,
+    date       DATETIME NOT NULL,
     FOREIGN KEY (userID) REFERENCES Users(id) ON DELETE CASCADE,
     FOREIGN KEY (walletID) REFERENCES Wallets(id) ON DELETE CASCADE,
     FOREIGN KEY (categoryID) REFERENCES Categories(id) ON DELETE NO ACTION
@@ -118,3 +118,4 @@ INSERT INTO Categories (name, type) VALUES
 select * from Categories
 select * from Wallets
 select * from Users
+select * from Transactions
