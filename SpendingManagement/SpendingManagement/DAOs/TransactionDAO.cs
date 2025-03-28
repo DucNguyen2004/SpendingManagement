@@ -119,6 +119,48 @@ namespace SpendingManagement.DAOs
                 .Take(3) // Show only the latest 5 transactions.ToList();
                 .ToList();
         }
+
+        public List<Transaction> GetTransactionsByFilter(int walletId, string filter, int userId)
+        {
+            var baseQuery = _context.Transactions
+                .Include(t => t.User).Where(t => t.UserId == userId)
+                .Include(t => t.Category)
+                .Include(t => t.Wallet);
+
+            IQueryable<Transaction> query = baseQuery;
+
+            if (walletId != 0)
+            {
+                query = query.Where(t => t.WalletId == walletId);
+            }
+
+            DateTime today = DateTime.UtcNow;
+            switch (filter.ToLower())
+            {
+                case "day":
+                    query = query.Where(t => t.Date.Date == today.Date);
+                    break;
+                case "week":
+                    DateTime startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+                    query = query.Where(t => t.Date.Date >= startOfWeek);
+                    break;
+                case "month":
+                    query = query.Where(t => t.Date.Year == today.Year && t.Date.Month == today.Month);
+                    break;
+                case "quarter":
+                    int currentQuarter = (today.Month - 1) / 3 + 1;
+                    query = query.Where(t => t.Date.Year == today.Year &&
+                                             (t.Date.Month - 1) / 3 + 1 == currentQuarter);
+                    break;
+                case "year":
+                    query = query.Where(t => t.Date.Year == today.Year);
+                    break;
+                case "all":
+                    break; // No filtering
+            }
+
+            return query.OrderByDescending(t => t.Date).ToList();
+        }
     }
 
 }

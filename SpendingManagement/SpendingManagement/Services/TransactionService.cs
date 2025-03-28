@@ -44,5 +44,9 @@ namespace SpendingManagement.Services
         {
             return _transactionRepo.GetRecentTransactions(userId);
         }
+        public List<Transaction> GetTransactionsByFilter(int walletId, string filter, int userId)
+        {
+            return _transactionRepo.GetTransactionsByFilter(walletId, filter, userId);
+        }
     }
 }

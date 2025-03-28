@@ -43,5 +43,10 @@ namespace SpendingManagement.Repositories
         {
             return _transactionDAO.GetRecentTransactions(userId);
         }
+
+        public List<Transaction> GetTransactionsByFilter(int walletId, string filter, int userId)
+        {
+            return _transactionDAO.GetTransactionsByFilter(walletId, filter, userId);
+        }
     }
 }

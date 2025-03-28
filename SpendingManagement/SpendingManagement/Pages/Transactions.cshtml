@@ -3,151 +3,111 @@
 @{
 }
 
-            <!-- Wallet Selection -->
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <h2>Transactions</h2>
-    
-                <select class="form-select w-auto">
-                    <option>My Cash</option>
-                    <option>Bank Account</option>
-                </select>
-            </div>
+<!-- Wallet Selection -->
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <h2>Transactions</h2>
+    <select class="form-select w-auto">
+        <option>My Cash</option>
+        <option>Bank Account</option>
+    </select>
+</div>
 
-            <!-- Balance Overview -->
-            <div class="mt-3 p-3 bg-white shadow-sm rounded">
-                <h5>Balance: <span class="text-primary">€1,035</span></h5>
-                <div class="d-flex justify-content-between">
-                    <span class="text-success">Inflow: +€2,500</span>
-                    <span class="text-danger">Outflow: -€1,465</span>
-                    <span class="fw-bold">+€1,035</span>
-                </div>
-            </div>
+<!-- Balance Overview -->
+<div class="mt-3 p-3 bg-white shadow-sm rounded">
+    <h5>Balance: <span class="text-primary">€1,035</span></h5>
+    <div class="d-flex justify-content-between">
+        <span class="text-success">Inflow: +(@Model.TotalIncome.ToString("N0") VND)</span>
+        <span class="text-danger">Outflow: -(@Model.TotalExpense.ToString("N0") VND)</span>
+        <span class="fw-bold">@(Model.TotalIncome - Model.TotalExpense > 0 ? "+" : "")@((Model.TotalIncome - Model.TotalExpense).ToString("N0")) VND</span>
+    </div>
+</div>
+
 <!-- Toggle View -->
 <div class="d-flex justify-content-center mt-3">
     <button class="btn btn-outline-primary me-2" id="viewByTransaction">View by Transaction</button>
     <button class="btn btn-outline-secondary" id="viewByCategory">View by Category</button>
 </div>
 
-
 <!-- Filter Menu -->
 <div class="dropdown mt-3 text-end">
-    <button class="btn btn-light dropdown-toggle" type="button" id="filterMenu" data-bs-toggle="dropdown" aria-expanded="false">
-        Filter Transactions
+    <button class="btn btn-light dropdown-toggle" type="button" id="filterMenu" data-bs-toggle="dropdown">
+        Filter Transactions (@Model.SelectedFilter)
     </button>
-    <ul class="dropdown-menu" aria-labelledby="filterMenu">
-        <li><a class="dropdown-item" href="#">Day</a></li>
-        <li><a class="dropdown-item" href="#">Week</a></li>
-        <li><a class="dropdown-item" href="#">Month</a></li>
-        <li><a class="dropdown-item" href="#">Quarter</a></li>
-        <li><a class="dropdown-item" href="#">Year</a></li>
-        <li><a class="dropdown-item" href="#">All</a></li>
-        <li><a class="dropdown-item" href="#">Custom</a></li>
+    <ul class="dropdown-menu">
+        @foreach (var filter in new[] { "Day", "Week", "Month", "Quarter", "Year", "All" })
+        {
+            <li>
+                <a class="dropdown-item @(Model.SelectedFilter == filter ? "active" : "")"
+                   asp-page="/Transactions" asp-route-filter="@filter">@filter</a>
+            </li>
+        }
     </ul>
 </div>
 
-            <!-- Tabs for Filtering -->
-            <ul class="nav nav-tabs mt-3">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Last Month</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">This Month</a>
-                </li>       
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Future</a>
-                </li>
-            </ul>
-
-<!-- Transaction List -->
+<!-- Transaction List (View by Date) -->
 <div id="transactionView" class="mt-3">
-    <h6 class="text-muted">20 July 2024</h6>
-    <div class="d-flex justify-content-between p-2 border-bottom">
-        <div>
-            <span class="fw-bold">Shopping</span>
-            <small class="text-muted d-block">Groceries</small>
+    @foreach (var group in Model.TransactionsByDate)
+    {
+        <div class="d-flex justify-content-between">
+            <h6 class="text-muted">@group.Date.ToString("dd MMMM yyyy")</h6>
+            <h6 class="fw-bold">@group.TotalAmount.ToString("N0") VND</h6>
         </div>
-        <span class="text-danger">-€1,200</span>
-    </div>
+        @foreach (var transaction in group.Transactions)
+        {
+            <div class="d-flex justify-content-between p-2 border-bottom">
+                <div>
+                    <span class="fw-bold">@transaction.Category</span>
+                    <small class="text-muted d-block">@transaction.Description</small>
+                </div>
+                <div>
+                    <span class="@transaction.Type">@transaction.Amount.ToString("N0") VND</span>
 
-    <h6 class="text-muted mt-3">12 July 2024</h6>
-    <div class="d-flex justify-content-between p-2 border-bottom">
-        <div>
-            <span class="fw-bold">Vehicle Maintenance</span>
-            <small class="text-muted d-block">Car Service</small>
-        </div>
-        <span class="text-danger">-€250</span>
-    </div>
-
-    <h6 class="text-muted mt-3">5 July 2024</h6>
-    <div class="d-flex justify-content-between p-2 border-bottom">
-        <div>
-            <span class="fw-bold">Salary</span>
-            <small class="text-muted d-block">Monthly Income</small>
-        </div>
-        <span class="text-success">+€2,500</span>
-    </div>
+                    <!-- View Detail Button -->
+                    <a asp-page="/TransactionDetail" asp-route-id="@transaction.Id" class="btn btn-primary">
+                        View Detail
+                    </a>
+                </div>
+            </div>
+        }
+        <div class="mb-4"></div>
+    }
 </div>
+
 <!-- Transaction List (View by Category) -->
 <div id="categoryView" class="mt-3 d-none">
-    <div style="display: flex; justify-content:space-between">
-        <div style="display:flex">
-            <h6 class="fw-bold">Food & Beverage</h6>
-            <p>1 transactions</p>
-        </div>
-        <h6 class="fw-bold">250000</h6>
-
-    </div>
-    <div class="p-3 border rounded mb-2">
+    @foreach (var category in Model.TransactionsByCategory)
+    {
         <div class="d-flex justify-content-between">
-            <span class="text-muted">20 July 2024, Saturday</span>
-            <span class="text-danger">-€15</span>
-        </div>
-    </div>
+            <div class="d-flex flex-column gap-2">
 
-    <div style="display: flex; justify-content:space-between">
-        <div style="display:flex">
-            <h6 class="fw-bold">Food & Beverage</h6>
-            <p>1 transactions</p>
-        </div>
-        <h6 class="fw-bold">250000</h6>
+                <h6 class="fw-bold">@category.Category</h6>
+                <h6 class="text-muted">@category.TotalTransactions Transactions</h6>
 
-    </div>
-    <div class="p-3 border rounded mb-2">
-        <div class="d-flex justify-content-between">
-            <span class="text-muted">20 July 2024, Saturday</span>
-            <span class="text-danger">-€1,200</span>
+            </div>
+            <h6 class="fw-bold">@category.TotalAmount.ToString("N0") VND</h6>
         </div>
-    </div>
 
-    <div style="display: flex; justify-content:space-between">
-        <div style="display:flex">
-            <h6 class="fw-bold">Food & Beverage</h6>
-            <p>1 transactions</p>
-        </div>
-        <h6 class="fw-bold">250000</h6>
+        @foreach (var transaction in category.Transactions)
+        {
+            <div class="p-3 border rounded mb-2">
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-column gap-2">
+                        <h6 class="fw-normal">@transaction.Date.ToString("dd MMMM yyyy")</h6>
+                        <span class="text-muted">@transaction.Description</span>
 
-    </div>
-    <div class="p-3 border rounded mb-2">
-        <div class="d-flex justify-content-between">
-            <span class="text-muted">12 July 2024, Friday</span>
-            <span class="text-danger">-€250</span>
-        </div>
-    </div>
+                    </div>
+                    <div>
+                        <span class="@transaction.Type">@transaction.Amount.ToString("N0") VND</span>
 
-    <div style="display: flex; justify-content:space-between">
-        <div style="display:flex">
-            <h6 class="fw-bold">Food & Beverage</h6>
-            <p>1 transactions</p>
-        </div>
-        <h6 class="fw-bold">250000</h6>
-
-    </div>
-    <div class="p-3 border rounded mb-2">
-        <div class="d-flex justify-content-between">
-            <span class="text-muted">5 July 2024, Friday</span>
-            <span class="text-success">+€2,500</span>
-        </div>
-    </div>
+                        <!-- View Detail Button -->
+                        <a asp-page="/TransactionDetail" asp-route-id="@transaction.Id" class="btn btn-primary">
+                            View Detail
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
 </div>
 
 <script>
@@ -155,13 +115,13 @@
         document.getElementById('transactionView').classList.remove('d-none');
         document.getElementById('categoryView').classList.add('d-none');
         this.classList.add('active');
-        document.getElementById('viewCategory').classList.remove('active');
+        document.getElementById('viewByCategory').classList.remove('active');
     });
 
     document.getElementById('viewByCategory').addEventListener('click', function() {
         document.getElementById('categoryView').classList.remove('d-none');
         document.getElementById('transactionView').classList.add('d-none');
         this.classList.add('active');
-        document.getElementById('viewTransaction').classList.remove('active');
+        document.getElementById('viewByTransaction').classList.remove('active');
     });
 </script>
