@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using SpendingManagement.Models;
 using SpendingManagement.Services;
 
 namespace SpendingManagement.Pages
@@ -20,14 +21,40 @@ namespace SpendingManagement.Pages
         public string ExpenseChartData { get; set; }
         public string IncomeChartData { get; set; }
         public string NetIncomeChartData { get; set; }
+        public string SelectedFilter { get; set; } = "Month"; // Default filter
+        public string SelectedMonth { get; set; }
 
-        public IActionResult OnGet()
+        public IActionResult OnGet(string filter = null)
         {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return RedirectToPage("Login");
+            }
+            // Default to current month if no filter is provided
             var now = DateTime.Now;
+            if (string.IsNullOrEmpty(filter))
+            {
+                filter = now.ToString("yyyy-MM");
+            }
+
+            SelectedFilter = filter;
 
             var startOfMonth = new DateTime(now.Year, now.Month, 1);   // Start of the month
+            int walletId = 1; // Replace with actual wallet selection logic
 
-            Transactions = transactionService.GetTransactionBetweenDates(startOfMonth, now)
+
+            // Convert the selected filter (YYYY-MM) to DateTime
+            DateTime selectedMonth;
+            if (!DateTime.TryParseExact(filter, "yyyy-MM", null, System.Globalization.DateTimeStyles.None, out selectedMonth))
+            {
+                selectedMonth = now;
+            }
+            List<Transaction> transactions;
+            transactions = transactionService.GetTransactionsByMonth(walletId, selectedMonth, userId.Value);
+
+            Transactions = transactions
                 .Select(t => new TransactionDto
                 {
                     Id = t.Id,
@@ -53,7 +80,7 @@ namespace SpendingManagement.Pages
                 .ToList();
 
             // Group transactions by week for Net Income Chart
-            var firstDayOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            var firstDayOfMonth = new DateTime(selectedMonth.Year, selectedMonth.Month, 1);
             var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
             var allWeeks = new List<(DateTime Start, DateTime End, string WeekLabel)>();
 

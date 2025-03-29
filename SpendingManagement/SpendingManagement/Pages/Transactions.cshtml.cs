@@ -8,17 +8,25 @@ namespace SpendingManagement.Pages
     public class TransactionsModel : PageModel
     {
         private TransactionService transactionService;
+        private readonly WalletService walletService;
         public List<TransactionGroupDto> TransactionsByDate { get; set; }
         public List<TransactionCategoryGroupDto> TransactionsByCategory { get; set; }
+        public decimal TotalBalance { get; set; }
         public decimal TotalIncome { get; set; }
         public decimal TotalExpense { get; set; }
         public string SelectedFilter { get; set; } = "Month"; // Default filter
+        public string SelectedMonth { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public List<Wallet> Wallets { get; set; } // Store all wallets for selection
+        public int SelectedWalletId { get; set; } // Store selected wallet ID
 
-        public TransactionsModel(TransactionService transactionService)
+        public TransactionsModel(TransactionService transactionService, WalletService walletService)
         {
             this.transactionService = transactionService;
+            this.walletService = walletService;
         }
-        public IActionResult OnGet(string filter = "Month")
+        public IActionResult OnGet(string filter = null, int? walletId = 0, DateTime? startDate = null, DateTime? endDate = null)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -26,12 +34,50 @@ namespace SpendingManagement.Pages
                 return RedirectToPage("/Login");
             }
 
+            // Get all wallets for dropdown selection
+            Wallets = walletService.GetAll(userId.Value);
+
+            if (walletId == 0)
+            {
+                TotalBalance = Wallets.Sum(x => x.Balance).Value;
+            }
+            else TotalBalance = Wallets.FirstOrDefault(x => x.Id == walletId).Balance.Value;
+            // Default wallet selection
+            SelectedWalletId = walletId ?? 0;
+
+            // Default to current month if no filter is provided
+            var now = DateTime.Now;
+            if (string.IsNullOrEmpty(filter))
+            {
+                filter = now.ToString("yyyy-MM");
+            }
+
             SelectedFilter = filter;
-            int walletId = 1; // Replace with actual wallet selection logic
 
-            var transactions = transactionService.GetTransactionsByFilter(walletId, filter, userId.Value);
+            List<Transaction> transactions;
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                // Custom date range filter
+                StartDate = startDate;
+                EndDate = endDate;
+                transactions = transactionService.GetTransactionBetweenDates(SelectedWalletId, startDate.Value, endDate.Value, userId.Value);
+                SelectedFilter = "Custom";
+            }
+            else
+            {
+                // Convert the selected filter (YYYY-MM) to DateTime
+                DateTime selectedMonth;
+                if (!DateTime.TryParseExact(filter, "yyyy-MM", null, System.Globalization.DateTimeStyles.None, out selectedMonth))
+                {
+                    selectedMonth = now;
+                }
+
+                transactions = transactionService.GetTransactionsByMonth(SelectedWalletId, selectedMonth, userId.Value);
 
 
+
+            }
             TransactionsByDate = GetTransactionsByDate(transactions);
             TransactionsByCategory = GetTransactionsByCategory(transactions);
 
@@ -39,6 +85,7 @@ namespace SpendingManagement.Pages
             TotalExpense = transactions.Sum(t => t.Type.Equals("expense") ? t.Amount : 0);
 
             return Page();
+
         }
 
         private List<TransactionGroupDto> GetTransactionsByDate(List<Transaction> listTransactions)

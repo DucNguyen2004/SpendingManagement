@@ -46,28 +46,34 @@ namespace SpendingManagement.Pages
             if (userId != null)
             {
                 Wallets = _walletService.GetAll(userId.Value);
+
+                // Get top 3 included wallets
+                Wallets = Wallets
+                                 .Take(3)
+                                 .ToList();
+
+                GetDataForChart(userId.Value);
+
+                var now = DateTime.Now;
+                var startOfWeek = now.AddDays(-((int)now.DayOfWeek)).Date; // Start of current week (Sunday)
+                var startOfMonth = new DateTime(now.Year, now.Month, 1);   // Start of the month
+
+                // Group & calculate for weekly and monthly data
+                WeeklySpending = CalculateTopSpending(startOfWeek, userId.Value);
+                MonthlySpending = CalculateTopSpending(startOfMonth, userId.Value);
+
+                GetRecentTransactions(userId.Value);
+
+            }
+            else
+            {
+                // If user is not logged in, set empty data
+                LabelsJson = "";
             }
 
-            // Get top 3 included wallets
-            Wallets = Wallets
-                             .Take(3)
-                             .ToList();
-
-            GetDataForChart();
-
-            var now = DateTime.Now;
-            var startOfWeek = now.AddDays(-((int)now.DayOfWeek)).Date; // Start of current week (Sunday)
-            var startOfMonth = new DateTime(now.Year, now.Month, 1);   // Start of the month
-
-            // Group & calculate for weekly and monthly data
-            WeeklySpending = CalculateTopSpending(startOfWeek);
-            MonthlySpending = CalculateTopSpending(startOfMonth);
-
-            if (userId != null)
-                GetRecentTransactions(userId.Value);
         }
 
-        private void GetDataForChart()
+        private void GetDataForChart(int userId)
         {
             var now = DateTime.Now;
             // Define the current month range
@@ -75,7 +81,7 @@ namespace SpendingManagement.Pages
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
             // Fetch transactions for the current month
-            var transactions = _transactionService.GetTransactionBetweenDates(startOfMonth, endOfMonth);
+            var transactions = _transactionService.GetTransactionBetweenDates(0, startOfMonth, endOfMonth, userId);
 
             // Group transactions by date
             var groupedData = transactions
@@ -127,14 +133,14 @@ namespace SpendingManagement.Pages
 
             // Compute 3-month average data
             DateTime threeMonthsAgo = startOfMonth.AddMonths(-3);
-            var pastTransactions = _transactionService.GetTransactionBetweenDates(threeMonthsAgo, startOfMonth);
+            var pastTransactions = _transactionService.GetTransactionBetweenDates(0, threeMonthsAgo, startOfMonth, userId);
 
             var pastGroupedData = pastTransactions
-                .GroupBy(t => t.Date.Day)
+                .GroupBy(t => t.Date)
                 .OrderBy(g => g.Key)
                 .Select(g => new
                 {
-                    Date = g.Key.ToString("dd MMM"),
+                    Date = g.Key.ToString("dd"),
                     Expense = g.Where(t => t.Type == "expense").Sum(t => t.Amount) / 3, // Divide by 3 months
                     Income = g.Where(t => t.Type == "income").Sum(t => t.Amount) / 3
                 })
@@ -149,11 +155,12 @@ namespace SpendingManagement.Pages
                 var date = DateTime.ParseExact(label, "dd MMM", CultureInfo.InvariantCulture);
 
                 if (date > now) break;
-                if (pastGroupedData.ContainsKey(label))
+                var day = date.ToString("dd");
+                if (pastGroupedData.ContainsKey(day))
                 {
                     // If a transaction exists, update values
-                    cumulativeExpenseAvg += pastGroupedData[label].Expense;
-                    cumulativeIncomeAvg += pastGroupedData[label].Income;
+                    cumulativeExpenseAvg += pastGroupedData[day].Expense;
+                    cumulativeIncomeAvg += pastGroupedData[day].Income;
                 }
 
                 // Store data
@@ -199,9 +206,9 @@ namespace SpendingManagement.Pages
             return RedirectToPage();
         }
 
-        private List<TopSpendingItem> CalculateTopSpending(DateTime startDate)
+        private List<TopSpendingItem> CalculateTopSpending(DateTime startDate, int userId)
         {
-            var filteredTransactions = _transactionService.GetTransactionBetweenDates(startDate, DateTime.Now).Where(t => t.Type.Equals("expense"));
+            var filteredTransactions = _transactionService.GetTransactionBetweenDates(0, startDate, DateTime.Now, userId).Where(t => t.Type.Equals("expense"));
             var totalExpense = filteredTransactions.Sum(t => (decimal?)t.Amount) ?? 0;
 
             return filteredTransactions

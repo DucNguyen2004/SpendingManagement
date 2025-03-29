@@ -36,9 +36,9 @@ namespace SpendingManagement.Services
         {
             _transactionRepo.DeleteTransaction(id);
         }
-        public List<Transaction> GetTransactionBetweenDates(DateTime start, DateTime end)
+        public List<Transaction> GetTransactionBetweenDates(int walletId, DateTime start, DateTime end, int userId)
         {
-            return _transactionRepo.GetTransactionBetweenDates(start, end);
+            return _transactionRepo.GetTransactionBetweenDates(walletId, start, end, userId);
         }
         public List<Transaction> GetRecentTransactions(int userId)
         {
@@ -47,6 +47,10 @@ namespace SpendingManagement.Services
         public List<Transaction> GetTransactionsByFilter(int walletId, string filter, int userId)
         {
             return _transactionRepo.GetTransactionsByFilter(walletId, filter, userId);
+        }
+        public List<Transaction> GetTransactionsByMonth(int walletId, DateTime month, int userId)
+        {
+            return _transactionRepo.GetTransactionsByMonth(walletId, month, userId);
         }
     }
 }

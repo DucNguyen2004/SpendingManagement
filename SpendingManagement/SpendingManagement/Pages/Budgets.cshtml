@@ -1,0 +1,103 @@
+﻿@page
+@model SpendingManagement.Pages.BudgetsModel
+
+@{
+    ViewData["Title"] = "Budgets";
+
+    decimal percentage = (50 / 100) * 100;
+}
+
+
+<div class="progress-container">
+    <div class="progress-wrapper">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-around mt-3">
+    <div>
+        <p class="mb-1 text-muted">Total budgets</p>
+        @* <h6>@Model.TotalBudget.ToString("N0")</h6> *@
+    </div>
+    <div>
+        <p class="mb-1 text-muted">Total spent</p>
+        @* <h6>@Model.TotalSpent.ToString("N0")</h6> *@
+    </div>
+    <div>
+        <p class="mb-1 text-muted">Days left</p>
+        <h6>29 days</h6>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let percentage = @percentage;
+        let progressFill = document.getElementById("progressFill");
+        let progressText = document.getElementById("progressText");
+
+        // Convert percentage to degrees (180 degrees max for half-circle)
+        let degrees = (percentage / 100) * 180;
+        progressFill.style.transform = `rotate(${degrees}deg)`;
+
+        // Animate the percentage text
+        let currentValue = 0;
+        let interval = setInterval(() => {
+            if (currentValue >= percentage) {
+                clearInterval(interval);
+            } else {
+                currentValue++;
+                progressText.innerText = currentValue + "%";
+            }
+        }, 10);
+    });
+</script>
+
+<style>
+    .progress-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+    }
+
+    .progress-wrapper {
+        position: relative;
+        width: 150px;
+        height: 75px;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 100%;
+        background: #ddd;
+        border-radius: 150px 150px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        width: 100%;
+        height: 100%;
+        background: green;
+        position: absolute;
+        bottom: 0;
+        transform-origin: bottom center;
+        transform: rotate(0deg);
+        transition: transform 1s ease-in-out;
+    }
+
+    .progress-text {
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: green;
+    }
+</style>
+
+

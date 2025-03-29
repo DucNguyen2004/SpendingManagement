@@ -35,9 +35,9 @@ namespace SpendingManagement.Repositories
         {
             _transactionDAO.DeleteTransaction(id);
         }
-        public List<Transaction> GetTransactionBetweenDates(DateTime start, DateTime end)
+        public List<Transaction> GetTransactionBetweenDates(int walletId, DateTime start, DateTime end, int userId)
         {
-            return _transactionDAO.GetTransactionBetweenDates(start, end);
+            return _transactionDAO.GetTransactionBetweenDates(walletId, start, end, userId);
         }
         public List<Transaction> GetRecentTransactions(int userId)
         {
@@ -47,6 +47,10 @@ namespace SpendingManagement.Repositories
         public List<Transaction> GetTransactionsByFilter(int walletId, string filter, int userId)
         {
             return _transactionDAO.GetTransactionsByFilter(walletId, filter, userId);
+        }
+        public List<Transaction> GetTransactionsByMonth(int walletId, DateTime month, int userId)
+        {
+            return _transactionDAO.GetTransactionsByMonth(walletId, month, userId);
         }
     }
 }

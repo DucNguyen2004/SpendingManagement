@@ -1,20 +1,36 @@
 ﻿@page
 @model SpendingManagement.Pages.TransactionsModel
 @{
+    var now = DateTime.Now;
+    var months = new[]
+    {
+        now.AddMonths(-3),
+        now.AddMonths(-2),
+        now.AddMonths(-1),
+        now,
+    };
 }
 
 <!-- Wallet Selection -->
 <div class="d-flex justify-content-between align-items-center mt-3">
     <h2>Transactions</h2>
-    <select class="form-select w-auto">
-        <option>My Cash</option>
-        <option>Bank Account</option>
-    </select>
+    <form method="get" class="d-flex gap-2">
+        <select name="walletId" class="form-select w-auto" onchange="this.form.submit()">
+            <option value="0" selected="@(Model.SelectedWalletId == 0 ? "selected" : null)">All Wallets</option>
+            @foreach (var wallet in Model.Wallets)
+            {
+                <option value="@wallet.Id" selected="@(wallet.Id == Model.SelectedWalletId ? "selected" : null)">
+                    @wallet.Name
+                </option>
+            }
+        </select>
+        <input type="hidden" name="filter" value="@Model.SelectedFilter" />
+    </form>
 </div>
 
 <!-- Balance Overview -->
 <div class="mt-3 p-3 bg-white shadow-sm rounded">
-    <h5>Balance: <span class="text-primary">@(Model.TotalIncome - Model.TotalExpense > 0 ? "+" : "")@((Model.TotalIncome - Model.TotalExpense).ToString("N0")) VND</span></h5>
+    <h5>Balance: <span class="text-primary">@(Model.TotalBalance.ToString("N0")) VND</span></h5>
     <div class="d-flex justify-content-between">
         <span class="text-success">Inflow: +(@Model.TotalIncome.ToString("N0") VND)</span>
         <span class="text-danger">Outflow: -(@Model.TotalExpense.ToString("N0") VND)</span>
@@ -28,32 +44,23 @@
     <button class="btn btn-outline-secondary" id="viewByCategory">View by Category</button>
 </div>
 
-<!-- Filter Menu -->
-<div class="dropdown mt-3 text-end">
-    <button class="btn btn-light dropdown-toggle" type="button" id="filterMenu" data-bs-toggle="dropdown">
-        Filter Transactions (@Model.SelectedFilter)
-    </button>
-    <ul class="dropdown-menu">
-        @foreach (var filter in new[] { "Day", "Week", "Month", "Quarter", "Year", "All" })
-        {
-            <li>
-                <a class="dropdown-item @(Model.SelectedFilter == filter ? "active" : "")"
-                   asp-page="/Transactions" asp-route-filter="@filter">@filter</a>
-            </li>
-        }
-    </ul>
-</div>
-<!-- Tabs for Filtering -->
+<!-- Custom Date Filter -->
+<form method="get" class="d-flex gap-2 mt-3">
+    <input type="date" name="startDate" class="form-control" value="@Model.StartDate?.ToString("yyyy-MM-dd")" required>
+    <input type="date" name="endDate" class="form-control" value="@Model.EndDate?.ToString("yyyy-MM-dd")" required>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
 <ul class="nav nav-tabs mt-3">
-    <li class="nav-item">
-        <a class="nav-link" href="#">Last Month</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="#">This Month</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Future</a>
-    </li>
+    @foreach (var month in months)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(Model.SelectedFilter == month.ToString("yyyy-MM") ? "active" : "")"
+               asp-page="/Transactions" asp-route-filter="@month.ToString("yyyy-MM")">
+                @month.ToString("MM-yyyy")
+            </a>
+        </li>
+    }
 </ul>
 <!-- Transaction List (View by Date) -->
 <div id="transactionView" class="mt-3">

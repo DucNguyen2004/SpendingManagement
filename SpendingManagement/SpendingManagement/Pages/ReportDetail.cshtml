@@ -1,6 +1,14 @@
 ﻿@page
 @model SpendingManagement.Pages.ReportDetailModel
 @{
+    var now = DateTime.Now;
+    var months = new[]
+    {
+        now.AddMonths(-3),
+        now.AddMonths(-2),
+        now.AddMonths(-1),
+        now,
+    };
 }
 <div class="d-flex justify-content-between align-items-center mt-3">
     <h2>Report Details</h2>
@@ -20,23 +28,23 @@
     </div>
 </div>
 <div class="mt-3 p-3 bg-white shadow-sm rounded">
-    <h5>Balance: <span class="text-primary">@Model.Balance.ToString("N2") VND</span></h5>
+    @* <h5>Balance: <span class="text-primary">@Model.Balance.ToString("N2") VND</span></h5> *@
     <div class="d-flex justify-content-between">
-        <span>Inflow: @Model.TotalIncome.ToString("N2") VND</span>
-        <span>Outflow: @Model.TotalExpense.ToString("N2") VND</span>
+        <span class="text-success">Inflow: @Model.TotalIncome.ToString("N2") VND</span>
+        <span class="text-danger">Outflow: @Model.TotalExpense.ToString("N2") VND</span>
     </div>
 </div>
 <!-- Tabs for Filtering -->
 <ul class="nav nav-tabs mt-3">
-    <li class="nav-item">
-        <a class="nav-link" href="#">Last Month</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="#">This Month</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Future</a>
-    </li>
+    @foreach (var month in months)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(Model.SelectedFilter == month.ToString("yyyy-MM") ? "active" : "")"
+               asp-page="/ReportDetail" asp-route-filter="@month.ToString("yyyy-MM")">
+                @month.ToString("MM-yyyy")
+            </a>
+        </li>
+    }
 </ul>
 
 
@@ -49,14 +57,14 @@
 <!-- Expense Breakdown Chart -->
 <div class="mt-3 p-3 bg-white shadow-sm rounded">
     <h5 class="text-danger">Total Expenses: @Model.TotalExpense.ToString("N2") VND</h5>
-    <a href="#" class="text-success">View Details</a>
+    @* <a href="#" class="text-success">View Details</a> *@
     <canvas id="expenseChart" style="max-height:300px"></canvas>
 </div>
 
 <!-- Income Breakdown Chart -->
 <div class="mt-3 p-3 bg-white shadow-sm rounded">
     <h5 class="text-primary">Total Incomes: @Model.TotalIncome.ToString("N2") VND</h5>
-    <a href="#" class="text-success">View Details</a>
+    @* <a href="#" class="text-success">View Details</a> *@
     <canvas id="incomeChart" style="max-height:300px"></canvas>
 </div>
 @* <!-- Net Income Chart --> *@

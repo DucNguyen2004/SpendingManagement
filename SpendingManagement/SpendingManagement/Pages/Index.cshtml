@@ -3,49 +3,19 @@
 @{
     ViewData["Title"] = "Home";
 }
-@* @{ *@
-@*     // Dummy Labels (X-Axis) *@
-@*     var labels = new List<string> { "01 Mar", "", "", "", "", "", "30 Mar" }; *@
-@*     var actualLabels = new List<string> { "01 Mar", "05 Mar", "10 Mar", "15 Mar", "20 Mar", "25 Mar", "30 Mar" }; *@
 
-@*     // Expenses Data (Cumulative Sum) *@
-@*     var expenseRaw = new List<int> { 5000000, 2000000, 1000000, 2000000, 4000000, 1500000, 3000000 }; *@
-@*     var expenseData = expenseRaw.Select((value, index) => expenseRaw.Take(index + 1).Sum()).ToList(); *@
-@*     var expenseTotal = expenseData.LastOrDefault(); *@
-
-@*     // Previous 3-month average (Cumulative) *@
-@*     var expenseAvgRaw = new List<int> { 4500000, 1800000, 900000, 1900000, 3800000, 1400000, 2900000 }; *@
-@*     var expenseAvg = expenseAvgRaw.Select((value, index) => expenseAvgRaw.Take(index + 1).Sum()).ToList(); *@
-
-@*     // Income Data (Cumulative Sum) *@
-@*     var incomeRaw = new List<int> { 10000000, 2000000, 1500000, 3000000, 2500000, 2000000, 4000000 }; *@
-@*     var incomeData = incomeRaw.Select((value, index) => incomeRaw.Take(index + 1).Sum()).ToList(); *@
-@*     var incomeTotal = incomeData.LastOrDefault(); *@
-
-@*     // Previous 3-month average (Cumulative) *@
-@*     var incomeAvgRaw = new List<int> { 9700000, 1900000, 1400000, 2800000, 2400000, 1900000, 3800000 }; *@
-@*     var incomeAvg = incomeAvgRaw.Select((value, index) => incomeAvgRaw.Take(index + 1).Sum()).ToList(); *@
-
-@*     // Convert to JSON for JavaScript *@
-@*     var labelsJson = Json.Serialize(labels); *@
-@*     var actualLabelsJson = Json.Serialize(actualLabels); *@
-@*     var expenseJson = Json.Serialize(expenseData); *@
-@*     var expenseAvgJson = Json.Serialize(expenseAvg); *@
-@*     var incomeJson = Json.Serialize(incomeData); *@
-@*     var incomeAvgJson = Json.Serialize(incomeAvg); *@
-@* } *@
 <div class="container mt-3">
 
     <div class="card mb-3">
-    <div class="card-header d-flex justify-content-between">
-        <strong>My Wallets</strong>
-        <a asp-page="/Wallets" class="text-primary">See all</a>
-    </div>
-    <div class="card-body">
-        <ul class="list-group">
-            @{
-                if(Model.Wallets.Count == 0)
-                {
+        <div class="card-header d-flex justify-content-between">
+            <strong>My Wallets</strong>
+            <a asp-page="/Wallets" class="text-primary">See all</a>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                @{
+                    if(Model.Wallets.Count == 0)
+                    {
                         <li class="list-group-item d-flex justify-content-center align-items-center">
                             <div class="text-center mt-4">
                                 <p>There is no wallet</p>
@@ -54,44 +24,53 @@
                                 </button>
                             </div>
                         </li>
+                    }
                 }
-            }
-            @foreach (var wallet in Model.Wallets)
-            {
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    @* <img src="images/@wallet.Icon" alt="@wallet.Name" width="30" height="30" class="me-2"> *@
-                    <span>@wallet.Name</span>
-                    <span class="ms-auto @(wallet.Balance < 0 ? "text-danger" : "text-success")">
-                        @wallet.Balance?.ToString("N0") đ
-                    </span>
-                </li>
-            }
-        </ul>
+                @foreach (var wallet in Model.Wallets)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @* <img src="images/@wallet.Icon" alt="@wallet.Name" width="30" height="30" class="me-2"> *@
+                        <span>@wallet.Name</span>
+                        <span class="ms-auto @(wallet.Balance < 0 ? "text-danger" : "text-success")">
+                            @wallet.Balance?.ToString("N0") đ
+                        </span>
+                    </li>
+                }
+            </ul>
+        </div>
     </div>
-</div>
 
     <div class="card mb-3">
-    <div class="card-header d-flex justify-content-between">
-        <strong>Report This Month</strong>
-        <a asp-page="/ReportDetail" class="text-primary">See report</a>
-    </div>
-    <div class="card-body">
-        <!-- Buttons to switch between Expense and Income -->
-        <div class="text-center">
-                <button class="btn btn-danger" onclick="updateChart('expense')">Total Expense: @Model.ExpenseTotal.ToString("N0") VND</button>
-                <button class="btn btn-primary" onclick="updateChart('income')">Total Income: @Model.IncomeTotal.ToString("N0") VND</button>
+        <div class="card-header d-flex justify-content-between">
+            <strong>Report This Month</strong>
+            <a asp-page="/ReportDetail" class="text-primary">See report</a>
         </div>
+        <div class="card-body">
+            <!-- Buttons to switch between Expense and Income -->
+            @{
+                if(Model.LabelsJson.Length == 0)
+                {
+                    <p class='text-center text-muted mt-3'>No Data Available</p>
+                }
+                else{
+                    <div class="text-center">
+                        <button class="btn btn-danger" onclick="updateChart('expense')">Total Expense: @Model.ExpenseTotal.ToString("N0") VND</button>
+                        <button class="btn btn-primary" onclick="updateChart('income')">Total Income: @Model.IncomeTotal.ToString("N0") VND</button>
+                    </div>
 
-        <canvas id="reportChart"></canvas>
+                    <canvas id="reportChart"></canvas>
+                }
+            }
+      
+        </div>
     </div>
-</div>
 
 
     <!-- Top Spending Section -->
     <div class="card mb-3">
         <div class="card-header d-flex justify-content-between">
             <span>Top Spending</span>
-            <a asp-page="/DetailExpenses" class="text-success">See details</a>
+            @* <a asp-page="/DetailExpenses" class="text-success">See details</a> *@
         </div>
 
         <!-- Filter Buttons -->
@@ -106,7 +85,6 @@
                 {
                     <li class="list-group-item d-flex justify-content-between">
                         <div>
-                            <img src="@spending.Icon" alt="@spending.Category" width="24" height="24">
                             @spending.Category
                         </div>
                         <span class="text-danger">@spending.Percentage% (@spending.Amount.ToString("N0") VND)</span>
@@ -119,7 +97,6 @@
                 {
                     <li class="list-group-item d-flex justify-content-between">
                         <div>
-                            <img src="@spending.Icon" alt="@spending.Category" width="24" height="24">
                             @spending.Category
                         </div>
                         <span class="text-danger">@spending.Percentage% (@spending.Amount.ToString("N0") VND)</span>
@@ -139,16 +116,13 @@
             <ul class="list-group">
                 @{
                     if (Model.RecentTransactions == null || Model.RecentTransactions.Count == 0) {
-                        <li class="list-group-item d-flex justify-content-between">
-                            <p>There is no transactions</p>
-                        </li>
+                            <p class='text-center text-muted mt-3'>There is no transactions</p>
                     }
                     else{
                         foreach (var transaction in Model.RecentTransactions)
                         {
                             <li class="list-group-item d-flex justify-content-between">
                                 <div>
-                                    <img src="@transaction.Icon" alt="@transaction.Category" width="24" height="24">
                                     @transaction.Category
                                     <br>
                                     <small class="text-muted">@transaction.Date.ToString("dddd, dd MMMM yyyy")</small>
@@ -198,7 +172,6 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        var ctx = document.getElementById('reportChart').getContext('2d');
 
         // Parse JSON data from Razor Model
         var labels = @Html.Raw(Model.LabelsJson);
@@ -213,6 +186,10 @@
         var currentLabel = 'This month';
         var currentBorderColor = 'red';
         var currentBackgroundColor = 'rgba(255, 0, 0, 0.2)';
+
+        if (labels.length !== 0) {
+
+            var ctx = document.getElementById('reportChart').getContext('2d');
 
                 var reportChart = new Chart(ctx, {
             type: 'line',
@@ -268,6 +245,8 @@
                 }
             }
         });
+        }
+        
 
 
         window.updateChart = function (type) {

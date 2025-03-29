@@ -104,11 +104,20 @@ namespace SpendingManagement.DAOs
             _context.SaveChanges();
         }
 
-        public List<Transaction> GetTransactionBetweenDates(DateTime start, DateTime end)
+        public List<Transaction> GetTransactionBetweenDates(int walletId, DateTime start, DateTime end, int userId)
         {
-            return _context.Transactions.Include(t => t.Category)
-                .Where(t => t.Date >= start && t.Date <= end)
-                .ToList();
+            var baseQuery = _context.Transactions
+                .Include(t => t.User).Where(t => t.UserId == userId)
+                .Include(t => t.Category)
+                .Include(t => t.Wallet)
+                .Where(t => t.UserId == userId && t.Date >= start && t.Date <= end);
+            IQueryable<Transaction> query = baseQuery;
+
+            if (walletId != 0)
+            {
+                query = query.Where(t => t.WalletId == walletId);
+            }
+            return query.OrderByDescending(t => t.Date).ToList();
         }
 
         public List<Transaction> GetRecentTransactions(int userId)
@@ -161,6 +170,31 @@ namespace SpendingManagement.DAOs
 
             return query.OrderByDescending(t => t.Date).ToList();
         }
+
+        public List<Transaction> GetTransactionsByMonth(int walletId, DateTime month, int userId)
+        {
+            var baseQuery = _context.Transactions
+                .Include(t => t.User).Where(t => t.UserId == userId)
+                .Include(t => t.Category)
+                .Include(t => t.Wallet)
+                .Where(t => t.Date.Year == month.Year && t.Date.Month == month.Month);
+            IQueryable<Transaction> query = baseQuery;
+
+            if (walletId != 0)
+            {
+                query = query.Where(t => t.WalletId == walletId);
+            }
+            return query.OrderByDescending(t => t.Date).ToList();
+            //return _context.Transactions
+            //    .Include(t => t.User)
+            //    .Include(t => t.Category)
+            //    .Include(t => t.Wallet)
+            //    .Where(t => t.WalletId == walletId && t.UserId == userId &&
+            //                t.Date.Year == month.Year && t.Date.Month == month.Month)
+            //    .OrderByDescending(t => t.Date)
+            //    .ToList();
+        }
+
     }
 
 }
