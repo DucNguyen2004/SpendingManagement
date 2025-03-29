@@ -14,7 +14,7 @@
 
 <!-- Balance Overview -->
 <div class="mt-3 p-3 bg-white shadow-sm rounded">
-    <h5>Balance: <span class="text-primary">€1,035</span></h5>
+    <h5>Balance: <span class="text-primary">@(Model.TotalIncome - Model.TotalExpense > 0 ? "+" : "")@((Model.TotalIncome - Model.TotalExpense).ToString("N0")) VND</span></h5>
     <div class="d-flex justify-content-between">
         <span class="text-success">Inflow: +(@Model.TotalIncome.ToString("N0") VND)</span>
         <span class="text-danger">Outflow: -(@Model.TotalExpense.ToString("N0") VND)</span>
@@ -43,7 +43,18 @@
         }
     </ul>
 </div>
-
+<!-- Tabs for Filtering -->
+<ul class="nav nav-tabs mt-3">
+    <li class="nav-item">
+        <a class="nav-link" href="#">Last Month</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="#">This Month</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Future</a>
+    </li>
+</ul>
 <!-- Transaction List (View by Date) -->
 <div id="transactionView" class="mt-3">
     @foreach (var group in Model.TransactionsByDate)
